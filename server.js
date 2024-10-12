@@ -6,23 +6,14 @@ import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 import knex from 'knex';
 
+// Load environment variables from .env file
 dotenv.config();
 
-// Initialize knex
+// Initialize Knex with the internal PostgreSQL connection URL
 const db = knex({
   client: 'pg',
-  connection: {
-    host:
-      process.env.DB_HOST ||
-      'dpg-cs4g1sd2ng1s739k05pg-a.frankfurt-postgres.render.com',
-    port: process.env.DB_PORT || 5432,
-    user: process.env.DB_USER || 'smartbrain_p29u_user',
-    password: process.env.DB_PASSWORD || 'u1SBvh49xFgRse0fdCAVfz8JQ7sKsipy',
-    database: process.env.DB_NAME || 'smartbrain_p29u',
-    ssl: {
-      rejectUnauthorized: false,
-    },
-  },
+  connection:
+    'postgresql://smartbrain_p29u_user:u1SBvh49xFgRse0fdCAVfz8JQ7sKsipy@dpg-cs4g1sd2ng1s739k05pg-a.frankfurt-postgres.render.com/smartbrain_p29u',
 });
 
 const app = express();
@@ -128,11 +119,11 @@ app.put('/image', async (req, res) => {
   }
 });
 
-// Clarifai API route
+
 app.post('/clarifai', async (req, res) => {
   const { input } = req.body;
 
-  // Store your Clarifai credentials in environment variables for security
+
   const PAT = process.env.CLARIFAI_PAT || '60d533bdd28643d7bf18ef4f6ea75f56';
   const USER_ID = process.env.CLARIFAI_USER_ID || 'pauljd1';
   const APP_ID = process.env.CLARIFAI_APP_ID || 'faceDetection';
