@@ -6,23 +6,26 @@ import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 import knex from 'knex';
 
-// Load environment variables from .env file
+// Load environment variables
 dotenv.config();
 
-// Initialize Knex with the internal PostgreSQL connection URL
+// Configure the Knex database connection
 const db = knex({
   client: 'pg',
   connection:
+    process.env.DATABASE_URL ||
     'postgresql://smartbrain_p29u_user:u1SBvh49xFgRse0fdCAVfz8JQ7sKsipy@dpg-cs4g1sd2ng1s739k05pg-a.frankfurt-postgres.render.com/smartbrain_p29u',
 });
 
+// Initialize the Express application
 const app = express();
 const saltRounds = 10;
 
-// Middleware
+// Middleware setup
 app.use(bodyParser.json());
 app.use(cors());
 
+// Root endpoint
 app.get('/', (req, res) => {
   res.send('Welcome to the Smart Brain API!');
 });
@@ -45,7 +48,7 @@ app.post('/signin', async (req, res) => {
 
       if (isValid) {
         const [user] = await db('users').select('*').where('email', email);
-        return res.json(user); // Return the user data
+        return res.json(user);
       } else {
         return res.status(400).json('Wrong credentials');
       }
@@ -119,10 +122,8 @@ app.put('/image', async (req, res) => {
   }
 });
 
-
 app.post('/clarifai', async (req, res) => {
   const { input } = req.body;
-
 
   const PAT = process.env.CLARIFAI_PAT || '60d533bdd28643d7bf18ef4f6ea75f56';
   const USER_ID = process.env.CLARIFAI_USER_ID || 'pauljd1';
@@ -171,7 +172,6 @@ app.post('/clarifai', async (req, res) => {
   }
 });
 
-// Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
