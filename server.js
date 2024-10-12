@@ -5,11 +5,17 @@ import cors from 'cors';
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
 import knex from 'knex';
+import path from 'path';
+import { fileURLToPath } from 'url'; 
 
-// Load environment variables
+
 dotenv.config();
 
-// Configure the Knex database connection
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
 const db = knex({
   client: 'pg',
   connection:
@@ -17,17 +23,18 @@ const db = knex({
     'postgresql://smartbrain_p29u_user:u1SBvh49xFgRse0fdCAVfz8JQ7sKsipy@dpg-cs4g1sd2ng1s739k05pg-a.frankfurt-postgres.render.com/smartbrain_p29u',
 });
 
-// Initialize the Express application
+
 const app = express();
 const saltRounds = 10;
 
-// Middleware setup
+
 app.use(bodyParser.json());
 app.use(cors());
 
-// Root endpoint
-app.get('/', (req, res) => {
-  res.send('Welcome to the Smart Brain API!');
+app.use(express.static(path.join(__dirname, 'build')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 // Signin route
@@ -91,7 +98,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Profile route
+
 app.get('/profile/:id', async (req, res) => {
   const { id } = req.params;
   try {
@@ -107,7 +114,7 @@ app.get('/profile/:id', async (req, res) => {
   }
 });
 
-// Image update route
+
 app.put('/image', async (req, res) => {
   const { id } = req.body;
   try {
@@ -121,6 +128,7 @@ app.put('/image', async (req, res) => {
     return res.status(400).json('Unable to update entries');
   }
 });
+
 
 app.post('/clarifai', async (req, res) => {
   const { input } = req.body;
