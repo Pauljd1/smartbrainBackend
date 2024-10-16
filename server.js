@@ -94,21 +94,23 @@ app.post('/register', async (req, res) => {
       .returning('email');
 
     if (loginEmail.length) {
-      // Ensure email was returned
       const user = await db('users')
         .insert({
-          email: loginEmail[0].email, // Access the email correctly
+          email: loginEmail[0].email,
           name,
           joined: new Date(),
         })
         .returning('*');
 
       if (user.length) {
-        return res.json(user[0]); // Send user data as JSON
+        console.log('User registration successful:', user[0]);
+        return res.json(user[0]);
       } else {
+        console.error('User could not be registered');
         return res.status(400).json('User could not be registered');
       }
     } else {
+      console.error('Unable to register');
       return res.status(400).json('Unable to register');
     }
   } catch (error) {
