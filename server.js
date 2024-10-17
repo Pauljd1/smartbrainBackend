@@ -3,25 +3,29 @@ import bodyParser from 'body-parser';
 import bcrypt from 'bcrypt';
 import cors from 'cors';
 import fetch from 'node-fetch';
-import dotenv from 'dotenv';
 import knex from 'knex';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Database connection
 const db = knex({
   client: 'pg',
-  connection: process.env.DATABASE_URL,
+  connection: {
+    host: 'dpg-cs4g1sd2ng1s739k05pg-a.frankfurt-postgres.render.com',
+    port: 5432,
+    user: 'smartbrain_p29u_user',
+    password: 'u1SBvh49xFgRse0fdCAVfz8JQ7sKsipy',
+    database: 'smartbrain_p29u',
+  },
 });
 
 const app = express();
 const saltRounds = 10;
 
-// CORS Configuration
+// CORS options
 const corsOptions = {
   origin: 'https://smartbrain-4gyf.onrender.com',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
@@ -30,7 +34,6 @@ const corsOptions = {
 
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
-
 app.use(express.static(path.join(__dirname, 'build')));
 
 app.get('*', (req, res) => {
@@ -105,14 +108,13 @@ app.post('/register', async (req, res) => {
   }
 });
 
-// Clarifai API route
 app.post('/clarifai', async (req, res) => {
   const { input } = req.body;
 
-  const PAT = process.env.CLARIFAI_PAT;
-  const USER_ID = process.env.CLARIFAI_USER_ID;
-  const APP_ID = process.env.CLARIFAI_APP_ID;
-  const MODEL_ID = process.env.CLARIFAI_MODEL_ID;
+  const PAT = '60d533bdd28643d7bf18ef4f6ea75f56';
+  const USER_ID = 'pauljd1';
+  const APP_ID = 'faceDetection';
+  const MODEL_ID = 'face-detection';
 
   const raw = JSON.stringify({
     user_app_id: {
@@ -156,8 +158,7 @@ app.post('/clarifai', async (req, res) => {
   }
 });
 
-// Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
